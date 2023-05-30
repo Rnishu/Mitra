@@ -1,0 +1,36 @@
+html{
+    height: 100%;
+}
+body{
+    background-image: linear-gradient(#141e30, #243b55);
+
+}
+.taskpost {
+    left:50px;
+    display:flex;
+    width:70vw;
+    height: 19vh;
+    border-style: solid;
+    border-color: beige;
+    border-radius: 10px;
+    justify-content: space-between;
+    font-family: roboto,sans-serif;
+    align-items: center;
+    }
+    .titles{
+        display:flex;
+        flex-direction: column;
+        justify-content:start;
+    }
+.post-element{
+    height: fit-content;
+    font-size: 25px;
+    display: inline;
+    color: aliceblue;
+}
+
+.summary{
+    opacity: 0.5;
+}
+
+    
