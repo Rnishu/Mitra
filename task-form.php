@@ -1,26 +1,27 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "mitra";
-
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-// Check connection
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+session_start();
+if(!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != true)
+{
+  header("Location:login-form.php");
+  exit;
 }
-
+require('dbconnect.php');
+require('functions.php');
+$userid=$title=$summary=$amount=$postid='';
+$sql = mysqli_prepare($conn, "INSERT INTO tasks(postid, userid, title, summary, amount) VALUES (?,?, ?, ?, ?)");
+  mysqli_stmt_bind_param($sql, "ssssi",$postid, $userid, $title, $summary, $amount);
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $title = $_REQUEST['title'];
-  $summary = $_REQUEST['summary'];
+  $userid=$_SESSION['userid'];
+  $title = sanitize($_REQUEST['title']);
+  $summary = sanitize($_REQUEST['summary']);
   $amount = $_REQUEST['amount'];
-  $deadline = $_REQUEST['deadline'];//Collecting Value
-  $sql = "INSERT INTO tasks(title, summary, amount, deadline)
-  VALUES ('$title', '$summary', '$amount','$deadline')";
-  $result=mysqli_query($conn,$sql);
+  $deadline = $_REQUEST['deadline'];
+  $postid = uniqid();//Collecting Value
+  mysqli_stmt_execute($sql);
+  $op = mysqli_query($conn,"UPDATE `tasks` SET deadline='$deadline' where postid='$postid'");
+  $result=mysqli_stmt_get_result($sql);
   header("Location: index.php");
+  exit;
 }
 
 $conn->close();
@@ -28,12 +29,13 @@ $conn->close();
 <!DOCTYPE html>
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="./css/form.css">
     </head>
     <body>
         <div class="login-box">
   <h2>Login</h2>
-  <form action="task-form.php" method="post">
+  <form id="NewTask" action="task-form.php" method="post">
     <div class="user-box">
       <input type="text" name="title" required="">
       <label>title</label>
@@ -53,15 +55,14 @@ $conn->close();
        placeholder="Select date and time" />
       <label>deadline</label>
     </div>
-    <input type="submit">
 
-    <a href="#">
+    <a onclick="document.querySelector('form').submit()">
       <span></span>
       <span></span>
       <span></span>
       <span></span>
       Submit
-    </a>
+</a>
     <a href="signin-form.php">New here? Sign In</a>
   </form>
 </div>
